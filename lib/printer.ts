@@ -310,7 +310,7 @@ function genericPrintNoParens(path: any, options: any, print: any) {
 
     case "ChainExpression":
       return path.call(print, "expression");
-    
+
     case "ChainElement": {
       parts.push(path.call(print, "object"));
 
@@ -2520,6 +2520,7 @@ function genericPrintNoParens(path: any, options: any, print: any) {
 function printDecorators(path: any, printPath: any) {
   const parts: any[] = [];
   const node = path.getValue();
+  const spacedDecorators = ['@service', '@alias', '@and', '@bool', '@collect', '@deprecatingAlias', '@empty', '@equal', '@expandProperties', '@filter', '@filterBy', '@gt', '@gte', '@intersect', '@lt', '@lte', '@map', '@mapBy', '@match', '@max', '@min', '@none', '@not', '@notEmpty', '@oneWay', '@or', '@readOnly', '@reads', '@setDiff', '@sort', '@sum', '@union', '@uniq', '@uniqBy'];
 
   if (
     node.decorators &&
@@ -2528,8 +2529,10 @@ function printDecorators(path: any, printPath: any) {
     // responsible for printing node.decorators.
     !util.getParentExportDeclaration(path)
   ) {
-    path.each(function (decoratorPath: any) {
-      parts.push(printPath(decoratorPath), "\n");
+    path.each(function(decoratorPath: any) {
+      const part = printPath(decoratorPath);
+      const sep = spacedDecorators.reduce((p, c) => p || part.toString().startsWith(c), false) ? ' ' : '\n';
+      parts.push(part, sep);
     }, "decorators");
   } else if (
     util.isExportDeclaration(node) &&
